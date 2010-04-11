@@ -12,6 +12,7 @@ Source3:        noiz2sa.xpm
 Source4:        copyright
 Patch0:         noiz2sa-0.51a.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}
+BuildRequires:  bison
 BuildRequires:  libSDL-devel
 BuildRequires:  libSDL_image-devel
 BuildRequires:  libSDL_mixer-devel
