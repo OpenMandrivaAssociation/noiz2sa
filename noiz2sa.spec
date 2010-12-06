@@ -1,6 +1,6 @@
 Name:           noiz2sa
 Version:        0.51a
-Release:        %mkrel 1
+Release:        %mkrel 2
 Summary:        Abstract arcade shooter
 License:        BSD
 Group:          Games/Arcade
