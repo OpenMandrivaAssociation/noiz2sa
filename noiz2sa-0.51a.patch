@@ -1,0 +1,147 @@
+diff -u -r noiz2sa/src/bulletml/bulletmlcommon.h noiz2sa_modified/src/bulletml/bulletmlcommon.h
+--- noiz2sa/src/bulletml/bulletmlcommon.h	2003-09-06 19:18:42.000000000 +0200
++++ noiz2sa_modified/src/bulletml/bulletmlcommon.h	2010-04-09 15:45:15.000000000 +0200
+@@ -1,11 +1,13 @@
+ #ifndef bulletmlcommon_h_
+ #define bulletmlcommon_h_
+ 
++#ifndef DECLSPEC
+ #ifdef WIN32_DLL_EXPORT
+ # define DECLSPEC __declspec(dllexport)
+ #else
+ # define DECLSPEC
+ #endif
++#endif
+ 
+ #endif // ! bulletmlcommon_h_
+ 
+diff -u -r noiz2sa/src/bulletml/calc.yy noiz2sa_modified/src/bulletml/calc.yy
+--- noiz2sa/src/bulletml/calc.yy	2003-08-06 20:40:08.000000000 +0200
++++ noiz2sa_modified/src/bulletml/calc.yy	2010-04-11 02:00:46.000000000 +0200
+@@ -11,6 +11,7 @@
+ 
+ #include <vector>
+ #include <sstream>
++#include <string.h>
+ 
+ #include "calc.h"
+ #include "formula.h"
+diff -u -r noiz2sa/src/bulletml/tinyxml/tinyxml.cpp noiz2sa_modified/src/bulletml/tinyxml/tinyxml.cpp
+--- noiz2sa/src/bulletml/tinyxml/tinyxml.cpp	2003-08-06 20:42:16.000000000 +0200
++++ noiz2sa_modified/src/bulletml/tinyxml/tinyxml.cpp	2010-04-09 15:43:47.000000000 +0200
+@@ -22,6 +22,7 @@
+ */
+ 
+ #include "tinyxml.h"
++#include <string.h>
+ 
+ 
+ TiXmlNode::TiXmlNode( NodeType _type )
+diff -u -r noiz2sa/src/bulletml/tinyxml/tinyxml.h noiz2sa_modified/src/bulletml/tinyxml/tinyxml.h
+--- noiz2sa/src/bulletml/tinyxml/tinyxml.h	2003-08-06 20:42:16.000000000 +0200
++++ noiz2sa_modified/src/bulletml/tinyxml/tinyxml.h	2010-04-09 15:43:55.000000000 +0200
+@@ -25,6 +25,7 @@
+ #ifndef TINYXML_INCLUDED
+ #define TINYXML_INCLUDED
+ 
++#include <cstdlib>
+ #include <string>
+ #include <stdio.h>
+ #include <assert.h>
+diff -u -r noiz2sa/src/bulletml/tinyxml/tinyxmlparser.cpp noiz2sa_modified/src/bulletml/tinyxml/tinyxmlparser.cpp
+--- noiz2sa/src/bulletml/tinyxml/tinyxmlparser.cpp	2003-08-06 20:42:16.000000000 +0200
++++ noiz2sa_modified/src/bulletml/tinyxml/tinyxmlparser.cpp	2010-04-09 15:44:14.000000000 +0200
+@@ -24,6 +24,7 @@
+ 
+ #include "tinyxml.h"
+ #include <ctype.h>
++#include <string.h>
+ 
+ const char* TiXmlBase::SkipWhiteSpace( const char* p )
+ {
+diff -u -r noiz2sa_orig/src/bulletml/Makefile noiz2sa_modified/src/bulletml/Makefile
+--- noiz2sa_orig/src/bulletml/Makefile	2003-08-08 22:36:24.000000000 +0200
++++ noiz2sa_modified/src/bulletml/Makefile	2010-04-12 20:30:41.000000000 +0200
+@@ -3,13 +3,14 @@
+ LIBS = tinyxml/tinyxml.o tinyxml/tinyxmlparser.o tinyxml/tinyxmlerror.o
+ #CXXFLAGS = -g -W -Wall -ansi -pedantic
+ #CXXFLAGS = -pg -g -W -Wall -ansi -pedantic
+-CXXFLAGS = -O2 -W -Wall -ansi -pedantic
+-CFLAGS = -O2
++CXXFLAGS ?= -O2 -W -Wall
++CFLAGS ?= -O2
+ OBJS = bulletmlparser-tinyxml.o bulletmlparser.o bulletmltree.o calc.o formula-variables.o bulletmlrunner.o bulletmlrunnerimpl.o
+ 
+ all: libbulletml.a
+ 
+ libbulletml.a: $(OBJS)
++	$(MAKE) -C tinyxml clean
+ 	$(MAKE) -C tinyxml
+ 	$(AR) -r libbulletml.a *.o tinyxml/tiny*.o
+ 
+diff -u -r noiz2sa/src/bulletml/tinyxml/Makefile noiz2sa_modified/src/bulletml/tinyxml/Makefile
+--- noiz2sa/src/bulletml/tinyxml/Makefile	2003-08-06 20:42:16.000000000 +0200
++++ noiz2sa_modified/src/bulletml/tinyxml/Makefile	2010-04-12 19:57:17.000000000 +0200
+@@ -79,7 +79,7 @@
+ 
+ OUTPUT := xmltest
+ 
+-all: ${OUTPUT}
++#all: ${OUTPUT}
+ 
+ 
+ #****************************************************************************
+@@ -93,6 +93,8 @@
+ 
+ OBJS := $(addsuffix .o,$(basename ${SRCS}))
+ 
++all: ${OBJS}
++
+ #****************************************************************************
+ # Output
+ #****************************************************************************
+diff -u -r noiz2sa/src/foecommand.h noiz2sa_modified/src/foecommand.h
+--- noiz2sa/src/foecommand.h	2003-08-10 22:09:46.000000000 +0200
++++ noiz2sa_modified/src/foecommand.h	2010-04-09 15:34:10.000000000 +0200
+@@ -36,10 +36,10 @@
+   
+   virtual void doChangeDirection(double d);
+   virtual void doChangeSpeed(double s);
+-  virtual void FoeCommand::doAccelX(double ax);
+-  virtual void FoeCommand::doAccelY(double ay);
+-  virtual double FoeCommand::getBulletSpeedX();
+-  virtual double FoeCommand::getBulletSpeedY();
++  virtual void doAccelX(double ax);
++  virtual void doAccelY(double ay);
++  virtual double getBulletSpeedX();
++  virtual double getBulletSpeedY();
+   
+  private:
+   struct foe *foe;
+diff -u -r noiz2sa/src/makefile.lin noiz2sa_modified/src/makefile.lin
+--- noiz2sa/src/makefile.lin	2004-06-20 09:32:48.000000000 +0200
++++ noiz2sa_modified/src/makefile.lin	2010-04-09 17:34:24.000000000 +0200
+@@ -10,9 +10,9 @@
+ PROG        = $(NAME)
+ 
+ DEFAULT_CFLAGS = `sdl-config --cflags`
+-LDFLAGS        = `sdl-config --libs` -L. -lglut -lbulletml -lSDL_mixer -mwindows -lstdc++
++LDFLAGS        = `sdl-config --libs` -L. -Lbulletml -lbulletml -lSDL_mixer -mwindows -lstdc++
+ 
+-MORE_CFLAGS = -O3
++MORE_CFLAGS = -O3 -g
+ 
+ CFLAGS  = $(DEFAULT_CFLAGS) $(MORE_CFLAGS)
+ CPPFLAGS  = $(DEFAULT_CFLAGS) $(MORE_CFLAGS) -I./bulletml/
+@@ -22,8 +22,10 @@
+ 	background.$(O) letterrender.$(O) \
+ 	screen.$(O) clrtbl.$(O) vector.$(O) degutil.$(O) rand.$(O) soundmanager.$(O)
+ 
+-$(PROG): $(OBJS)
++$(PROG): $(OBJS) bulletml/libbulletml.a
+ 	$(CC) $(CFLAGS) -o $(PROG) $(OBJS) $(LDFLAGS)
++bulletml/libbulletml.a:
++	(cd bulletml; make)
+ 
+ clean:
+ 	$(RM) $(PROG) *.$(O)
