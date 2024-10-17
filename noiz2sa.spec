@@ -4,7 +4,7 @@ Release:        %mkrel 2
 Summary:        Abstract arcade shooter
 License:        BSD
 Group:          Games/Arcade
-URL:            http://noiz2sa.sourceforge.net/
+URL:            https://noiz2sa.sourceforge.net/
 Source0:        http://downloads.sourceforge.net/noiz2sa/noiz2sa-%{version}.tar.gz
 Source1:        noiz2sa.6
 Source2:        noiz2sa.desktop
